@@ -1,0 +1,6 @@
+0 Background Noise
+1 face_detect
+2 read_text
+3 scene
+4 time
+5 weather
