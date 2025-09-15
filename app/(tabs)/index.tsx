@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 import { Camera, useCameraPermissions } from 'expo-camera';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-import Voice from '@react-native-community/voice';
+import Voice from '@react-native-voice/voice';
 
 import CameraService from '../../src/services/CameraService';
 import IntentService from '../../src/services/IntentService';
