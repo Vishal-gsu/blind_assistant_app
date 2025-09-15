@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "scout1",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "assetBundlePatterns": [
       "**/*",
       "assets/models/*"
@@ -20,7 +19,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.vishal_gsu.scout1"
     },
     "web": {
@@ -43,11 +41,9 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "buildToolsVersion": "34.0.0",
-            "androidGradlePluginVersion": "8.2.1",
-            "googleServicesVersion": "4.3.15"
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
           }
         }
       ]
