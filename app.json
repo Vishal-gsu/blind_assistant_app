@@ -46,7 +46,8 @@
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
             "buildToolsVersion": "34.0.0",
-            "androidGradlePluginVersion": "8.2.1"
+            "androidGradlePluginVersion": "8.2.1",
+            "googleServicesVersion": "4.3.15"
           }
         }
       ]
