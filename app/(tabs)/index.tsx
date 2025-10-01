@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
-import { Camera, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-import Voice from '@react-native-voice/voice';
 
 import CameraService from '../../src/services/CameraService';
 import IntentService from '../../src/services/IntentService';
@@ -13,12 +12,11 @@ import { useStore } from '../../src/store';
 
 export default function HomeScreen() {
   const [permission, requestPermission] = useCameraPermissions();
-  const cameraRef = useRef<Camera>(null);
+  const cameraRef = useRef<CameraView>(null);
 
   const { 
     isListening, 
     isSending, 
-    isSpeaking, 
     lastResponseText, 
     setListening, 
     setSending, 
@@ -31,43 +29,44 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (cameraRef.current) {
-      CameraService.setCameraRef(cameraRef);
+      CameraService.setCameraRef(cameraRef.current);
     }
   }, [cameraRef]);
 
   useEffect(() => {
-    VoiceService.init();
-
-    Voice.onSpeechResults = async (e) => {
+    const handleWakeWord = async () => {
+      console.log('Wake word detected! Starting simulated process...');
       setListening(false);
-      const text = e.value?.[0] || '';
-      if (text) {
-        setSending(true);
-        const intent = await IntentService.getIntent(text);
-        const imageData = await CameraService.takePicture();
+      setSending(true);
 
-        if (imageData) {
-          const requestData: ProcessRequest = {
-            task: intent.task as ProcessRequest['task'],
-            image_data: imageData,
-            query_text: (intent as any).query_text,
-          };
-          const response = await NetworkService.processImage(requestData);
-          if (response) {
-            setLastResponseText(response.result_text);
-            setSpeaking(true);
-            TtsService.speak(response.result_text, () => setSpeaking(false));
-          }
+      // Simulate speech-to-text result
+      const text = 'describe the scene';
+      
+      const intent = await IntentService.getIntent(text);
+      const imageData = await CameraService.takePicture();
+
+      if (imageData) {
+        const requestData: ProcessRequest = {
+          task: intent.task as ProcessRequest['task'],
+          image_data: imageData,
+          query_text: (intent as any).query_text,
+        };
+        const response = await NetworkService.processImage(requestData);
+        if (response) {
+          setLastResponseText(response.result_text);
+          setSpeaking(true);
+          TtsService.speak(response.result_text, () => setSpeaking(false));
         }
-        setSending(false);
       }
+      setSending(false);
     };
+
+    VoiceService.init(handleWakeWord);
 
     return () => {
       VoiceService.destroy();
-      Voice.destroy().then(Voice.removeAllListeners);
     };
-  }, []);
+  }, [setLastResponseText, setListening, setSending, setSpeaking]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -87,7 +86,7 @@ export default function HomeScreen() {
       scale.value = withSpring(1);
       opacity.value = withTiming(1, { duration: 500, easing: Easing.inOut(Easing.ease) });
     }
-  }, [isListening, isSending]);
+  }, [isListening, isSending, opacity, scale]);
 
   if (!permission) {
     return <View />;
@@ -106,7 +105,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} ref={cameraRef} />
+      <CameraView style={styles.camera} ref={cameraRef} />
       <View style={styles.overlay}>
         <Animated.View style={[styles.indicator, animatedStyle]} />
         <View style={styles.responseContainer}>

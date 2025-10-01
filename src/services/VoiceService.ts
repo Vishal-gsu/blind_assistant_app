@@ -1,27 +1,18 @@
 import { BuiltInKeywords, PorcupineManager } from '@picovoice/porcupine-react-native';
-import Voice from '@react-native-voice/voice';
-import { useStore } from '../store';
+import { Camera } from 'expo-camera';
 
-// TODO: Replace with your actual AccessKey from Picovoice Console
-const ACCESS_KEY = 'YOUR_ACCESS_KEY_HERE';
+// Access key is loaded from environment variables
+const ACCESS_KEY = process.env.EXPO_PUBLIC_PICOVOICE_ACCESS_KEY || process.env.PICOVOICE_ACCESS_KEY;
 
 /**
- * A singleton service to handle wake word detection and voice commands.
+ * A singleton service to handle wake word detection.
  */
 class VoiceService {
   private static instance: VoiceService;
   private porcupineManager: PorcupineManager | null = null;
-  private isListeningAfterWakeWord = false;
 
-  private constructor() {
-    Voice.onSpeechStart = () => useStore.getState().setListening(true);
-    Voice.onSpeechEnd = () => useStore.getState().setListening(false);
-  }
+  private constructor() {}
 
-  /**
-   * Returns the singleton instance of the VoiceService.
-   * @returns {VoiceService} The singleton instance.
-   */
   public static getInstance(): VoiceService {
     if (!VoiceService.instance) {
       VoiceService.instance = new VoiceService();
@@ -31,28 +22,34 @@ class VoiceService {
 
   /**
    * Initializes the wake word engine.
+   * @param onWakeWord - A callback function to be executed when the wake word is detected.
    */
-  public async init() {
-    if (ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE') {
-      console.error('Please provide your Picovoice AccessKey in VoiceService.ts');
+  public async init(onWakeWord: () => void) {
+    if (!ACCESS_KEY) {
+      console.error('Picovoice access key not found. Please set PICOVOICE_ACCESS_KEY in your .env file.');
+      return;
+    }
+
+    const micPermission = await Camera.requestMicrophonePermissionsAsync();
+    if (micPermission.status !== 'granted') {
+      console.error('Microphone permission not granted');
       return;
     }
 
     try {
+      console.log('Initializing Porcupine wake word engine...');
       this.porcupineManager = await PorcupineManager.fromBuiltInKeywords(
         ACCESS_KEY,
-        [BuiltInKeywords.PORCUPINE],
+        [BuiltInKeywords.BUMBLEBEE],
         (keywordIndex: number) => {
           if (keywordIndex === 0) {
-            // Wake word detected
-            this.isListeningAfterWakeWord = true;
-            useStore.getState().setListening(true);
-            this.startListening();
+            onWakeWord();
           }
         }
       );
 
       await this.porcupineManager.start();
+      console.log('Porcupine started! Listening for "Bumblebee"...');
 
     } catch (err) {
       console.error(err);
@@ -60,24 +57,22 @@ class VoiceService {
   }
 
   /**
-   * Starts listening for voice commands.
+   * Stops the wake word engine.
    */
-  public async startListening() {
-    try {
-      await Voice.start('en-US');
-    } catch (e) {
-      console.error(e);
+  public async stop() {
+    if (this.porcupineManager) {
+      await this.porcupineManager.stop();
+      console.log('Porcupine stopped.');
     }
   }
 
   /**
-   * Stops listening for voice commands.
+   * Starts the wake word engine.
    */
-  public async stopListening() {
-    try {
-      await Voice.stop();
-    } catch (e) {
-      console.error(e);
+  public async start() {
+    if (this.porcupineManager) {
+      await this.porcupineManager.start();
+      console.log('Porcupine started! Listening for "Bumblebee"...');
     }
   }
 

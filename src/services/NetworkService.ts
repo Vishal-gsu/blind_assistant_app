@@ -1,7 +1,7 @@
 import axios from 'axios';
   
-// IMPORTANT: Replace with your actual laptop's IP address.
-const PROFESSOR_URL = 'http://192.168.1.6:8000/process_data';
+// Professor server URL from environment variables
+const PROFESSOR_URL = process.env.EXPO_PUBLIC_PROFESSOR_SERVER_URL || 'http://localhost:8000/process_data';
 
 export type ProcessRequest = {
   task: 'describe_scene' | 'read_text' | 'find_object' | 'answer_question';
