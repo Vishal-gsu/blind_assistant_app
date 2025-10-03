@@ -4,7 +4,7 @@ Scout1 is a React Native mobile application that provides voice-controlled assis
 
 ## 🎯 Features
 
-- **Wake Word Detection**: Always listening for "Bumblebee" to activate
+- **Wake Word Detection**: Always listening for "Hey Iris" to activate
 - **Voice Commands**: Supports "describe the scene" and more
 - **Camera Integration**: Takes photos and processes them with AI
 - **Text-to-Speech**: Provides audio feedback to users
@@ -141,11 +141,48 @@ The app requires a separate AI server (called "Professor") that processes images
 
 ## 📱 Usage
 
+### Basic Operation
 1. **Launch the app** on your device
 2. **Grant permissions** for camera and microphone
-3. **Say "Bumblebee"** to activate the assistant
+3. **Say "Bumblebee"** to activate the assistant (currently using built-in wake word)
 4. **Give a command** like "describe the scene"
 5. **Listen to the audio response**
+
+### Custom Wake Word & Intent Models
+The app is ready for custom Picovoice models:
+- **Custom Wake Word**: "Hey Iris" model can be created and integrated
+- **Custom Intent Recognition**: Support for multiple voice commands
+- **See CUSTOM_MODELS_GUIDE.md** for detailed instructions on creating and installing custom models
+
+### Available Commands (with comprehensive intent system)
+
+**🎯 Visual Analysis:**
+- "Describe the scene" - Get AI description of surroundings
+- "Read the text" - Extract and read text from images
+- "Find my keys" - Look for specific objects
+- "How many people are here?" - Answer visual questions
+
+**👤 People Recognition:**
+- "Who is this person?" - Recognize faces
+- "Save this person as John" - Register new faces
+- "Do you know this person?" - Check if face is known
+
+**📅 Information Services:**
+- "What time is it?" - Get current time and date
+- "What's the weather?" - Weather information (API integration pending)
+- "Set my location to Boston" - Configure default city
+
+**💬 Interaction:**
+- "What can you do?" - List all capabilities
+- "Hello" - General conversation
+- "Help me" - Get assistance
+
+### 🧪 Testing Interface
+The app includes a built-in testing panel:
+1. Tap the "TEST" button in the top-right corner
+2. Select any intent to test different voice commands
+3. Real-time intent classification and processing
+4. Perfect for development and demonstration
 
 ## 🔒 Security Notes
 
@@ -199,7 +236,7 @@ expo build:ios --type archive
 1. **"Wake word not detected"**
    - Check microphone permissions
    - Verify Picovoice access key in `.env`
-   - Ensure you're saying "Bumblebee" clearly
+   - Ensure you're saying "Hey Iris" clearly and distinctly
 
 2. **"Network error"**
    - Confirm Professor server is running
